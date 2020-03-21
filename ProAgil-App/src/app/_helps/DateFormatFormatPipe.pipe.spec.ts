@@ -5,7 +5,7 @@ import { DateFormatFormatPipePipe } from './DateFormatFormatPipe.pipe';
 
 describe('Pipe: DateFormatFormatPipee', () => {
   it('create an instance', () => {
-    let pipe = new DateFormatFormatPipePipe();
+    const pipe = new DateFormatFormatPipePipe();
     expect(pipe).toBeTruthy();
   });
 });
