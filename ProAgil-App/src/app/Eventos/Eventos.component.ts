@@ -18,8 +18,7 @@ export class EventosComponent implements OnInit {
             , private modalService: BsModalService
             , private fb: FormBuilder
             , private localeService: BsLocaleService
-            )
-            {
+            ) {
               this.localeService.use('pt-br');
             }
 
@@ -32,6 +31,8 @@ export class EventosComponent implements OnInit {
   imagemMargem = 2;
   visibleImagem = true;
   registerForm: FormGroup;
+  tipo: string;
+  bodyDeletarEvento: string;
 
   /** Propriedades */
   get filtroLista(): string {
@@ -53,11 +54,26 @@ export class EventosComponent implements OnInit {
     this.visibleImagem = !this.visibleImagem;
   }
 
-  openModal(template: any, editar: boolean = false) {
+  editarEvento(template: any, evento: Evento) {
+    this.tipo = 'put';
+    this.openModal(template);
+    this.evento = evento;
+    this.registerForm.patchValue(evento);
+  }
+
+  novoEvento(template: any) {
+    this.tipo = 'post';
+    this.openModal(template);
+  }
+
+  deletarEvento(template: any, evento: Evento) {
+    this.openModal(template);
+    this.evento = evento;
+    this.bodyDeletarEvento = `Tem certeza que deseja excluir o Evento: ${evento.tema}, Código: ${evento.tema}`;
+  }
+
+  openModal(template: any) {
     this.registerForm.reset();
-    // if (editar) {
-    //   this.registerForm = Object.assign({}, this.registerForm.value);
-    // }
     template.show();
   }
 
@@ -77,39 +93,50 @@ export class EventosComponent implements OnInit {
       tema: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(50)]],
       local: ['', [Validators.required]],
       dataEvento: ['', [Validators.required]],
+      imagemUrl: ['', [Validators.required]],
       qtdPessoas: ['', [Validators.required, Validators.max(120000)]],
       telefone: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      imagemUrl: ['', [Validators.required]]
+      email: ['', [Validators.required, Validators.email]]
     });
   }
 
   salvarAlteracao(template: any) {
     if (this.registerForm.valid) {
-      this.evento = Object.assign({}, this.registerForm.value);
-      this.eventoService.postEvento(this.evento).subscribe(
-        (novoEvento: Evento) => {
-          console.log(novoEvento);
-          template.hide();
-          this.getEventos();
-        }, error => {
-          console.log(error);
-        });
+       if (this.tipo === 'post') {
+        this.evento = Object.assign({}, this.registerForm.value);
+        this.eventoService.postEvento(this.evento).subscribe(
+          (novoEvento: Evento) => {
+            console.log(novoEvento);
+            template.hide();
+            this.getEventos();
+          }, error => {
+            console.log(error);
+            template.hide();
+          });
+       } else {
+        this.evento = Object.assign({id: this.evento.id}, this.registerForm.value);
+        this.eventoService.putEvento(this.evento).subscribe(
+          () => {
+            template.hide();
+            this.getEventos();
+          }, error => {
+            console.log(error);
+            template.hide();
+          });
+      }
     }
   }
 
-  editarEvento(template: any) {
-    if (this.registerForm.valid) {
-      this.evento = Object.assign({}, this.registerForm.value);
-      this.eventoService.putEvento(this.evento).subscribe(
-        (novoEvento: Evento) => {
-          console.log(novoEvento);
-          template.hide();
-          this.getEventos();
-        }, error => {
-          console.log(error);
-        });
-    }
+  confirmDelete(template: any) {
+    this.evento = Object.assign({id: this.evento.id}, this.registerForm.value);
+    this.eventoService.deleteEvento(this.evento.id).subscribe(
+      () => {
+        template.hide();
+        this.getEventos();
+      }, error => {
+        console.log(error);
+        template.hide();
+      });
   }
 
   filtrarEventos(filtrarPor: string): Evento[] {

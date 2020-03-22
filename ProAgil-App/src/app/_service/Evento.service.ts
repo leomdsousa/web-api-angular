@@ -15,11 +15,11 @@ getEventos(): Observable<Evento[]> {
 }
 
 getEventosByTema(tema: string): Observable<Evento> {
-  return this.http.get<Evento>(`${this.baseUrl}/tema/${tema}`);
+  return this.http.get<Evento>(`${this.baseUrl}/${tema}`);
 }
 
 getEventoById(id: number): Observable<Evento> {
-  return this.http.get<Evento>(`${this.baseUrl}/id/${id}`);
+  return this.http.get<Evento>(`${this.baseUrl}/${id}`);
 }
 
 postEvento(evento: Evento) {
@@ -27,7 +27,11 @@ postEvento(evento: Evento) {
 }
 
 putEvento(evento: Evento) {
-  return this.http.post(this.baseUrl, evento);
+  return this.http.put(`${this.baseUrl}/${evento.id}`, evento);
+}
+
+deleteEvento(id: number) {
+  return this.http.delete(`${this.baseUrl}/${id}`);
 }
 
 }
