@@ -12,13 +12,13 @@ namespace ProAgil.WebAPI.Dtos {
         [Required(ErrorMessage="Campo {0} é obrigatório")]
         [StringLength(100, MinimumLength=2)]
         public string Local { get; set; }
-        public string Lote { get; set; }
+        public string ImagemUrl { get; set; }
 
         [Required(ErrorMessage="Campo {0} é obrigatório")]
         public string DataEvento { get; set; }
 
         [Required]
-        [Range(2, 120000, ErrorMessage="Quantidade deve ser entre 2 e 120 mil")]
+        //[Range(2, 120000, ErrorMessage="Quantidade deve ser entre 2 e 120 mil")]
         public int QtdPessoas { get; set; }
 
         [Phone]

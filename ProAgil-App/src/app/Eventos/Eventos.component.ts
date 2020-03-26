@@ -3,6 +3,7 @@ import { EventoService } from '../_service/Evento.service';
 import { Evento } from '../_model/Evento';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { defineLocale, BsLocaleService, ptBrLocale } from 'ngx-bootstrap/';
 defineLocale('pt-br', ptBrLocale);
 
@@ -17,12 +18,14 @@ export class EventosComponent implements OnInit {
   constructor(private eventoService: EventoService
             , private modalService: BsModalService
             , private fb: FormBuilder
+            , private toastr: ToastrService
             , private localeService: BsLocaleService
             ) {
               this.localeService.use('pt-br');
             }
 
   /** Variaveis */
+  titulo = 'Evento';
   filtroListaProp: string;
   eventosFiltrados: Evento[];
   eventos: Evento[];
@@ -33,6 +36,9 @@ export class EventosComponent implements OnInit {
   registerForm: FormGroup;
   tipo: string;
   bodyDeletarEvento: string;
+  file: File;
+  filenameToUpdate: string;
+  dataAtual: string;
 
   /** Propriedades */
   get filtroLista(): string {
@@ -57,8 +63,10 @@ export class EventosComponent implements OnInit {
   editarEvento(template: any, evento: Evento) {
     this.tipo = 'put';
     this.openModal(template);
-    this.evento = evento;
-    this.registerForm.patchValue(evento);
+    this.evento = Object.assign({}, evento);
+    this.filenameToUpdate = evento.imagemUrl.toString();
+    this.evento.imagemUrl = '';
+    this.registerForm.patchValue(this.evento);
   }
 
   novoEvento(template: any) {
@@ -100,28 +108,76 @@ export class EventosComponent implements OnInit {
     });
   }
 
+  onFileChange(event) {
+    const reader = new FileReader();
+
+    if (event.target.files && event.target.files.length) {
+      this.file = event.target.files;
+      console.log(this.file);
+    }
+
+    console.log(event);
+  }
+
+  uploadImagem() {
+    if(this.tipo === 'post') {
+      const nomeArquivo = this.evento.imagemUrl.split('\\', 3);
+      this.evento.imagemUrl = nomeArquivo[2];
+
+      this.eventoService.postUploadEvento(this.file, nomeArquivo[2]).subscribe(
+        () => {
+          this.dataAtual = new Date().getMilliseconds().toString();
+          this.getEventos();
+        }
+      );
+    } else {
+      this.evento.imagemUrl = this.filenameToUpdate;
+      this.eventoService.postUploadEvento(this.file, this.filenameToUpdate).subscribe(
+        () => {
+          this.dataAtual = new Date().getMilliseconds().toString();
+          this.getEventos();
+        }
+      );
+    }
+
+  }
+
   salvarAlteracao(template: any) {
     if (this.registerForm.valid) {
        if (this.tipo === 'post') {
         this.evento = Object.assign({}, this.registerForm.value);
+
+        // UPLOAD DO IMAGEM
+        this.uploadImagem();
+
+        // CREATE
         this.eventoService.postEvento(this.evento).subscribe(
           (novoEvento: Evento) => {
             console.log(novoEvento);
             template.hide();
             this.getEventos();
+            this.toastr.success('Registro criado com sucesso', 'Evento');
           }, error => {
             console.log(error);
             template.hide();
+            this.toastr.error(`Falha ao criar registro. Erro: ${error}` , 'Evento');
           });
        } else {
         this.evento = Object.assign({id: this.evento.id}, this.registerForm.value);
+
+        // UPLOAD DO IMAGEM
+        this.uploadImagem();
+
+        // UPDATE
         this.eventoService.putEvento(this.evento).subscribe(
           () => {
             template.hide();
             this.getEventos();
+            this.toastr.success('Registro editado com sucesso', 'Evento');
           }, error => {
             console.log(error);
             template.hide();
+            this.toastr.error(`Falha ao alterar registro. Erro: ${error}` , 'Evento');
           });
       }
     }
@@ -131,11 +187,13 @@ export class EventosComponent implements OnInit {
     this.evento = Object.assign({id: this.evento.id}, this.registerForm.value);
     this.eventoService.deleteEvento(this.evento.id).subscribe(
       () => {
-        template.hide();
         this.getEventos();
+        template.hide();
+        this.toastr.success('Registro deletado com sucesso', 'Evento');
       }, error => {
         console.log(error);
         template.hide();
+        this.toastr.error(`Falha ao deletar registro. Erro: ${error}` , 'Evento');
       });
   }
 

@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Net.Http.Headers;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +7,7 @@ using ProAgil.Repository;
 using ProAgil.Domain;
 using ProAgil.WebAPI.Dtos;
 using AutoMapper;
+using System.IO;
 
 namespace ProAgil.WebAPI.Controllers
 {
@@ -31,14 +33,16 @@ namespace ProAgil.WebAPI.Controllers
                 var eventos = await _repo.GetAllEventosAsync(true);
                 var eventosRetorno = _mapper.Map<EventoDto[]>(eventos);
 
-                return Ok(eventosRetorno);
+                //return Ok(eventosRetorno);
+                return Ok(eventos);
             }
             catch (System.Exception)
             {
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Banco de Dados Falhou");
             }
         }
-        [HttpGet("id/{eventoId}")]
+
+        [HttpGet("{eventoId}")]
         public async Task<ActionResult> Get(int eventoId)
         {
             try
@@ -80,7 +84,6 @@ namespace ProAgil.WebAPI.Controllers
         {
             try
             {
-
                 var evento = _mapper.Map<Evento>(eventoDto);
 
                 _repo.Add(evento);
@@ -95,6 +98,39 @@ namespace ProAgil.WebAPI.Controllers
             }
 
             return BadRequest();
+        }
+
+        //POST - UPLOAD DE IMAGEM 
+        [HttpPost("upload")]
+        public ActionResult upload()
+        {
+            var fullPath = string.Empty;
+
+            try
+            {
+                var file = Request.Form.Files[0];
+                var folderName = Path.Combine("Resources", "images");
+                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+
+                if(file.Length > 0) 
+                {
+                    var filename = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName;
+                    fullPath = Path.Combine(pathToSave, filename.Replace("\"", "").Trim());
+                }
+
+                using(var stream = new FileStream(fullPath, FileMode.Create)) 
+                {
+                    file.CopyTo(stream);
+                }                    
+
+                return Ok();
+            }
+            catch (System.Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Banco de Dados Falhou");
+            }
+
+            //return BadRequest("Erro ao tentar relaizar upload");
         }
 
         //PUT

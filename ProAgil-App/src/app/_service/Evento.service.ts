@@ -26,6 +26,14 @@ postEvento(evento: Evento) {
   return this.http.post(this.baseUrl, evento);
 }
 
+postUploadEvento(file: File, nomeArquivo: string) {
+  const fileToUpload = file[0] as File;
+  const formData = new FormData();
+  formData.append('file', fileToUpload, nomeArquivo);
+
+  return this.http.post(`${this.baseUrl}/upload`, formData);
+}
+
 putEvento(evento: Evento) {
   return this.http.put(`${this.baseUrl}/${evento.id}`, evento);
 }
