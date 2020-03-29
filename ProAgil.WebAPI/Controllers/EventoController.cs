@@ -18,6 +18,7 @@ namespace ProAgil.WebAPI.Controllers
     {
         private readonly IProAgilRepository _repo;
         private readonly IMapper _mapper;
+        
         public EventoController(IProAgilRepository repo, IMapper mapper)
         {
             _repo = repo;
