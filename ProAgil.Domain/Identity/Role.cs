@@ -1,6 +1,5 @@
-using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
-using System;
+using Microsoft.AspNetCore.Identity;
 
 namespace ProAgil.Domain.Identity
 {

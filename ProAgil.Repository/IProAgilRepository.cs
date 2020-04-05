@@ -1,5 +1,5 @@
-using ProAgil.Domain;
 using System.Threading.Tasks;
+using ProAgil.Domain;
 
 namespace ProAgil.Repository
 {
@@ -7,18 +7,19 @@ namespace ProAgil.Repository
     {
         //GERAL
         void Add<T>(T entity) where T : class;
-        void Delete<T>(T entity) where T : class;
         void Update<T>(T entity) where T : class;
-        Task<bool> SaveChangesAsync(); 
+        void Delete<T>(T entity) where T : class;
+        void DeleteRange<T>(T[] entity) where T : class;
 
-         //EVENTO
-        Task<Evento[]> GetAllEventosAsync(bool incluirPalestrante); 
-        Task<Evento[]> GetEventosByTemaAsync(string tema, bool incluirPalestrante); 
-        Task<Evento> GetEventoByIdAsync(int id, bool incluirPalestrante); 
+        Task<bool> SaveChangesAsync();
 
-         //PALESTRANTES
-        Task<Palestrante[]> GetAllPalestrantesAsync(bool incluirEvento); 
-        Task<Palestrante[]> GetPalestrantesByNameAsync(string palestrante, bool incluirEvento); 
-        Task<Palestrante> GetPalestranteByIdAsync(int id, bool incluirEvento); 
+        //EVENTOS
+        Task<Evento[]> GetAllEventoAsyncByTema(string tema, bool includePalestrantes);
+        Task<Evento[]> GetAllEventoAsync(bool includePalestrantes);
+        Task<Evento> GetEventoAsyncById(int EventoId, bool includePalestrantes);
+
+        //PALESTRANTE
+        Task<Palestrante[]> GetAllPalestrantesAsyncByName(string name, bool includeEventos);
+        Task<Palestrante> GetPalestranteAsync(int PalestranteId, bool includeEventos);
     }
 }

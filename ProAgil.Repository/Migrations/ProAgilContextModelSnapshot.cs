@@ -3,7 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using ProAgil.Repository;
+using ProAgil.Respository;
 
 namespace ProAgil.Repository.Migrations
 {
@@ -89,11 +89,11 @@ namespace ProAgil.Repository.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime>("DataEvento");
+                    b.Property<DateTime?>("DataEvento");
 
                     b.Property<string>("Email");
 
-                    b.Property<string>("ImagemUrl");
+                    b.Property<string>("ImagemURL");
 
                     b.Property<string>("Local");
 
@@ -212,7 +212,7 @@ namespace ProAgil.Repository.Migrations
 
                     b.Property<decimal>("Preco");
 
-                    b.Property<int>("Quantidade");
+                    b.Property<int>("quantidade");
 
                     b.HasKey("Id");
 
@@ -228,7 +228,7 @@ namespace ProAgil.Repository.Migrations
 
                     b.Property<string>("Email");
 
-                    b.Property<string>("ImagemUrl");
+                    b.Property<string>("ImagemURL");
 
                     b.Property<string>("MiniCurriculo");
 
@@ -251,7 +251,7 @@ namespace ProAgil.Repository.Migrations
 
                     b.HasIndex("PalestranteId");
 
-                    b.ToTable("PalestrantesEventos");
+                    b.ToTable("PalestranteEventos");
                 });
 
             modelBuilder.Entity("ProAgil.Domain.RedeSocial", b =>
@@ -265,7 +265,7 @@ namespace ProAgil.Repository.Migrations
 
                     b.Property<int?>("PalestranteId");
 
-                    b.Property<string>("Url");
+                    b.Property<string>("URL");
 
                     b.HasKey("Id");
 
@@ -273,7 +273,7 @@ namespace ProAgil.Repository.Migrations
 
                     b.HasIndex("PalestranteId");
 
-                    b.ToTable("RedesSociais");
+                    b.ToTable("RedeSociais");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
